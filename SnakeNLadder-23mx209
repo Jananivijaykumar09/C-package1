@@ -1,0 +1,125 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int rollDice() {
+    return rand() % 6 + 1;
+}
+
+int playGame(int currentPlayer, int currentPosition) {
+    int dice = rollDice();
+    printf("\t\t\t\tDice = %d\n\n", dice);
+
+    if (dice == 6) {
+        printf("Dice=6: You have earned a chance to play one more time.\n");
+        return currentPosition + dice;
+    }
+
+    int newPosition = currentPosition + dice;
+
+    int snakes[][2] = {{99, 1}, {65, 40}, {25, 9}};
+    int ladders[][2] = {{13, 42}, {60, 83}, {70, 93}};
+
+    for (int i = 0; i < 3; ++i) {
+        if (newPosition == snakes[i][0]) {
+            printf("Player %d got bitten by a snake!\n", currentPlayer);
+            return snakes[i][1];
+        } else if (newPosition == ladders[i][0]) {
+            printf("Player %d found a ladder!\n", currentPlayer);
+            return ladders[i][1];
+        }
+    }
+
+    return newPosition;
+}
+
+void displayChart(int currentPlayer, int p1Pos, int p2Pos) {
+    printf("--------------------------------------------------------------------------\n");
+    for (int i = 10; i > 0; i--) {
+        int t = i - 1;
+        int c = 0;
+        for (int j = 1; j <= 10; j++) {
+            int position = (i % 2 == 0) ? i * 10 + j : i * 10 + 10 - j + 1;
+            if (position == p1Pos && position == p2Pos) {
+                printf("$P1$&$P2$\t");
+            } else if (position == p1Pos) {
+                printf("$P1$\t");
+            } else if (position == p2Pos) {
+                printf("$P2$\t");
+            } else {
+                printf("%d\t", position);
+            }
+        }
+        printf("\n\n");
+    }
+    printf("--------------------------------------------------------------------------\n");
+}
+
+int main() {
+    srand(time(NULL));
+    int p1Pos = 0, p2Pos = 0;
+
+    while (1) {
+        printf("\t\t\t BOARD GAME \n");
+        printf("\t\t\tJANANI and PRIYADHARSHINI ARE THE PLAYERS\n");
+        printf("Snakes: 25 to 9, 65 to 40, 99 to 1.\n");
+        printf("Ladders: 13 to 42, 60 to 83, 70 to 93.\n");
+        printf("Choose your option:\n");
+        printf("1. P1 plays\n");
+        printf("2. P2 plays\n");
+        printf("3. P1 quits\n");
+        printf("4. P2 quits\n");
+        printf("5. Exit\n");
+
+        int choice;
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                p1Pos = playGame(1, p1Pos);
+                displayChart(1, p1Pos, p2Pos);
+                printf("P2 position is %d\n", p2Pos);
+                if (p1Pos >= 100) {
+                    printf("P1 is the winner!\n");
+                    exit(0);
+                }
+                break;
+
+            case 2:
+                p2Pos = playGame(2, p2Pos);
+                displayChart(2, p1Pos, p2Pos);
+                printf("P1 position is %d\n", p1Pos);
+                if (p2Pos >= 100) {
+                    printf("P2 is the winner!\n");
+                    exit(0);
+                }
+                break;
+
+            case 3:
+                printf("P1 quits. P2 wins!\n");
+                exit(0);
+                break;
+
+            case 4:
+                printf("P2 quits. P1 wins!\n");
+                exit(0);
+                break;
+
+            case 5:
+                printf("Game over!\n");
+                if (p1Pos >= 100) {
+                    printf("P1 is the winner!\n");
+                } else if (p2Pos >= 100) {
+                    printf("P2 is the winner!\n");
+                } else {
+                    printf("It's a draw!\n");
+                }
+                exit(0);
+
+            default:
+                printf("Incorrect choice. Try Again.\n");
+        }
+    }
+
+    return 0;
+}
